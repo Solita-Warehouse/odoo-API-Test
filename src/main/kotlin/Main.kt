@@ -1,6 +1,9 @@
 import org.apache.xmlrpc.client.XmlRpcClient
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl
 import java.net.URL
+import java.util.Arrays.asList
+
+
 /**
  *
  * https://www.odoo.com/documentation/16.0/developer/reference/external_api.html
@@ -33,21 +36,20 @@ fun main(args: Array<String>) {
 
     // Authentication
     val uid = client.execute(commonConfig, "authenticate", listOf(db, username, password, emptyMap<String, Any>())) as Int
-    println("Authenticated user id: $uid\n")
+    println("Authenticated user id: $uid")
 
     /**
-     * Fetching Model's Data
+     * READ - Fetching Model's Data
      *
      * Set up client and config.
      * connection string for this config : http://localhost:8069 + xmlrpc/2/object
      * "The second endpoint is xmlrpc/2/object. It is used to
      * call methods of odoo models via the execute_kw RPC function." -odoo.com
      */
-    println("### Fetching user's name ###")
+    println("\r\n\r\n### READ - Fetching user's name ###")
     val models = XmlRpcClient()
     val modelConfig = XmlRpcClientConfigImpl()
     modelConfig.serverURL = URL("$url/xmlrpc/2/object")
-
     /**
      * The result from the query is stored in an array (authenticatedUser)
      */
@@ -64,9 +66,11 @@ fun main(args: Array<String>) {
 
     printXMLRPC(authenticatedUser)
 
-    println("### Fetching all fields found in res.partner ###")
+    /**
+     * FIELDS_GET - Fetching all the fields for a given model
+     */
 
-
+    println("### FIELDS_GET - Fetching all fields found in res.partner ###")
     val myList: List<String> = emptyList()
 
     val fieldsOfPartner =  models.execute(
@@ -81,10 +85,51 @@ fun main(args: Array<String>) {
             )
         ))as Map<*, *>
 
-    //println(fieldsOfPartner)
     for(attribute in fieldsOfPartner){
-        println(attribute)
+        print(attribute)
     }
+    println("\r\n")
+
+    /**
+     * SEARCH - Returning the ID for all the entry of a table that fits search parameters
+     */
+    println("### SEARCH - All partner whose name start with D ###")
+
+    val partnerNameStartWithID =  models.execute(
+        modelConfig,
+        "execute_kw",
+        listOf(
+            db, uid, password,
+            "res.partner", "search",
+            listOf(
+                listOf(
+                    listOf("name", "like", "D%")
+                    //listOf("active", "=", false)
+
+                )
+            )
+        ))as Array<*>
+
+    for(id in partnerNameStartWithID){
+        print("${id} ")
+    }
+    println()
+
+    val partnerNameStartWith = models.execute(
+        modelConfig,
+        "execute_kw",
+        listOf(
+            db, uid, password,
+            "res.partner", "read",
+            listOf(partnerNameStartWithID),
+            mapOf("fields" to listOf( "name"))
+        )
+    ) as Array<*>
+
+    for(partner in partnerNameStartWith){
+        println(partner)
+    }
+
 }
 
 /**
