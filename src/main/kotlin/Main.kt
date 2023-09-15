@@ -1,7 +1,10 @@
 import org.apache.xmlrpc.client.XmlRpcClient
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl
 import java.net.URL
-
+/**
+ *
+ * https://www.odoo.com/documentation/16.0/developer/reference/external_api.html
+ */
 fun main(args: Array<String>) {
     // Connection information
     val url = "http://localhost:8069"
@@ -48,14 +51,40 @@ fun main(args: Array<String>) {
     /**
      * The result from the query is stored in an array (authenticatedUser)
      */
-    val authenticatedUser = models.execute(modelConfig,"execute_kw", listOf(
-        db, uid, password,
-        "res.users", "read",
-        listOf(arrayOf(2,3)),
-        mapOf("fields" to listOf("partner_id", "login"))
-    )) as Array<*>
+    val authenticatedUser = models.execute(
+        modelConfig,
+        "execute_kw",
+        listOf(
+            db, uid, password,
+            "res.users", "read",
+            listOf(arrayOf(2,3)),
+            mapOf("fields" to listOf("partner_id", "login"))
+        )
+    ) as Array<*>
 
     printXMLRPC(authenticatedUser)
+
+    println("### Fetching all fields found in res.partner ###")
+
+
+    val myList: List<String> = emptyList()
+
+    val fieldsOfPartner =  models.execute(
+        modelConfig,
+        "execute_kw",
+        listOf(
+            db, uid, password,
+            "res.partner", "fields_get",
+            myList,
+            mapOf(
+                "attributes" to listOf("string", "type")
+            )
+        ))as Map<*, *>
+
+    //println(fieldsOfPartner)
+    for(attribute in fieldsOfPartner){
+        println(attribute)
+    }
 }
 
 /**
