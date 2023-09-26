@@ -1,4 +1,4 @@
-For documentations see [XmlRpc in Kotlin](https://www.notion.so/gianad/XmlRpc-in-Kotlin-84736aca137f4839a9f6cbc050ea9cf6?pvs=4)
+For documentation see [XmlRpc in Kotlin](https://www.notion.so/gianad/XmlRpc-in-Kotlin-84736aca137f4839a9f6cbc050ea9cf6?pvs=4)
 
 # odoo-API-Test
 This is a simple Kotlin project that uses XmlRpc to connect to Odoo and fetch data. It is based on Odoo External API documentation
