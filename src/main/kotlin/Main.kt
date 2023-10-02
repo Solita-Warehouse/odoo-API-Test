@@ -66,11 +66,58 @@ fun main(args: Array<String>) {
 
     printXMLRPC(authenticatedUser)
 
+    println("\r\n\r\n### CREATE - Creating new product ###")
+
+    // val productValues are the values you give the product you are creating. You can add more fields to it if you wish
+    val productValues = mapOf(
+        "name" to "Rentable product?",
+        "type" to "product",
+        "sale_ok" to "false",
+        "purchase_ok" to "false",
+        "rental" to "true",
+        "lst_price" to 19.99,
+        // Add more fields as needed
+    )
+// Code that creates the model
+    val productId = models.execute(
+        modelConfig,
+        "execute_kw",
+        listOf(
+        db, uid, password,
+        "product.product", "create",
+        listOf(productValues)
+    )) as Int
+
+
+// Creating sales order, but not working yet.
+
+    val orderValues = mapOf(
+        "partner_id" to 1,
+    )
+
+    val orderId = models.execute(
+        modelConfig,
+        "execute_kw",
+        listOf(
+            db, uid, password,
+            "sale.order", "create",
+            listOf(orderValues)
+        )) as Int
+
+    val confirmOrder = models.execute(
+        modelConfig,
+        "execute_kw",
+        listOf(
+            db, uid, password,
+            "sale.order", "action_confirm",
+            listOf(orderId)
+        ))
+
     /**
      * FIELDS_GET - Fetching all the fields for a given model
      */
 
-    println("### FIELDS_GET - Fetching all fields found in res.partner ###")
+    println("### FIELDS_GET - Fetching all fields found in product.product ###")
     val myList: List<String> = emptyList()
 
     val fieldsOfPartner =  models.execute(
@@ -78,7 +125,7 @@ fun main(args: Array<String>) {
         "execute_kw",
         listOf(
             db, uid, password,
-            "res.partner", "fields_get",
+            "product.product", "fields_get",
             myList,
             mapOf(
                 "attributes" to listOf("string", "type")
@@ -160,3 +207,4 @@ fun printXMLRPC(response: Array<*>){
         println()
     }
 }
+
