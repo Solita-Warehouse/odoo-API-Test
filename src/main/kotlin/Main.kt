@@ -66,9 +66,24 @@ fun main(args: Array<String>) {
 
     printXMLRPC(authenticatedUser)
 
+    println("\r\n\r\n### READ - Fetching all products with name and price ###")
+
+    val productsList = models.execute(
+        modelConfig,
+        "execute_kw",
+        listOf(
+            db, uid, password,
+            "product.product", "read",
+            listOf(arrayOf(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)),
+            mapOf("fields" to listOf("name", "lst_price"))
+        )
+    ) as Array<*>
+
+    printXMLRPC(productsList)
+
     println("\r\n\r\n### CREATE - Creating new product ###")
 
-    // val productValues are the values you give the product you are creating. You can add more fields to it if you wish
+// val productValues are the values you give the product you are creating. You can add more fields to it if you wish
     val productValues = mapOf(
         "name" to "Rentable product?",
         "type" to "product",
