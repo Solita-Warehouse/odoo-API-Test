@@ -74,7 +74,7 @@ fun main(args: Array<String>) {
         listOf(
             db, uid, password,
             "product.product", "read",
-            listOf(arrayOf(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)),
+            listOf(arrayOf(45,46)),
             mapOf("fields" to listOf("name", "lst_price"))
         )
     ) as Array<*>
@@ -104,29 +104,93 @@ fun main(args: Array<String>) {
     )) as Int
 
 
-// Creating sales order, but not working yet.
+// Creating sales order, and confirms it. currently adds a product to a specific order(id45)
 
+    val orderLineValues = mapOf(
+        "order_id" to 33,
+        "product_id" to 45
+    )
     val orderValues = mapOf(
         "partner_id" to 1,
+        "type_id" to 2
     )
 
-    val orderId = models.execute(
+    val orderLine = models.execute(
         modelConfig,
         "execute_kw",
         listOf(
             db, uid, password,
-            "sale.order", "create",
-            listOf(orderValues)
+            "sale.order.line", "create",
+            listOf(orderLineValues)
         )) as Int
 
-    val confirmOrder = models.execute(
+    try {
+        // Create the sales order
+        val createResult = models.execute(
+            modelConfig,
+            "execute_kw",
+            listOf(
+                db, uid, password,
+                "sale.order", "create",
+                listOf(listOf(orderValues))
+            )) as Array<Any>
+
+        val orderId = createResult[0] as Int
+
+        // Confirm the sales order (replace with the correct method name)
+        val confirmResult = models.execute(
+            modelConfig,
+            "execute_kw",
+            listOf(
+                db, uid, password,
+                "sale.order", "action_confirm",  // Replace with the correct method name
+                listOf(listOf(orderId))
+            )) as Boolean  // Assuming it returns a boolean indicating success
+
+        if (confirmResult) {
+            println("Sales order successfully confirmed with ID: $orderId")
+        } else {
+            println("Failed to confirm the sales order.")
+        }
+    } catch (e: Exception) {
+        println("Error creating or confirming the sales order: ${e.message}")
+    }
+
+
+
+
+
+
+
+
+
+
+
+    val orderLineList = models.execute(
         modelConfig,
         "execute_kw",
         listOf(
             db, uid, password,
-            "sale.order", "action_confirm",
-            listOf(orderId)
-        ))
+            "sale.order.line", "read",
+            listOf(arrayOf(0,1,2,3,4,5,6,7,8,9)),
+            mapOf("fields" to listOf("product_id"))
+        )
+    ) as Array<*>
+
+    printXMLRPC(orderLineList)
+
+    val rentalList = models.execute(
+        modelConfig,
+        "execute_kw",
+        listOf(
+            db, uid, password,
+            "sale.order", "read",
+            listOf(arrayOf(33)),
+            mapOf("fields" to listOf("name"))
+        )
+    ) as Array<*>
+
+    printXMLRPC(rentalList)
 
     /**
      * FIELDS_GET - Fetching all the fields for a given model
