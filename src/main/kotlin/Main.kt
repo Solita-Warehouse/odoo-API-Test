@@ -73,8 +73,8 @@ fun main(args: Array<String>) {
         "execute_kw",
         listOf(
             db, uid, password,
-            "product.product", "read",
-            listOf(arrayOf(45,46)),
+            "product.product", "search_read",
+            listOf(emptyList<Any>()),
             mapOf("fields" to listOf("name", "lst_price"))
         )
     ) as Array<*>
@@ -85,11 +85,11 @@ fun main(args: Array<String>) {
 
 // val productValues are the values you give the product you are creating. You can add more fields to it if you wish
     val productValues = mapOf(
-        "name" to "Rentable product?",
+        "name" to "Test",
         "type" to "product",
-        "sale_ok" to "false",
-        "purchase_ok" to "false",
-        "rental" to "true",
+        "sale_ok" to false,
+        "purchase_ok" to false,
+        "rental" to true,
         "lst_price" to 19.99,
         // Add more fields as needed
     )
@@ -104,27 +104,14 @@ fun main(args: Array<String>) {
     )) as Int
 
 
-// Creating sales order, and confirms it. currently adds a product to a specific order(id45)
-
-    val orderLineValues = mapOf(
-        "order_id" to 33,
-        "product_id" to 45
-    )
-    val orderValues = mapOf(
-        "partner_id" to 1,
-        "type_id" to 2
-    )
-
-    val orderLine = models.execute(
-        modelConfig,
-        "execute_kw",
-        listOf(
-            db, uid, password,
-            "sale.order.line", "create",
-            listOf(orderLineValues)
-        )) as Int
+// Creates rental order and adds the "Test" product into the order line of the rental order.
 
     try {
+
+        val orderValues = mapOf(
+            "partner_id" to 3,
+            "type_id" to 2
+        )
         // Create the sales order
         val createResult = models.execute(
             modelConfig,
@@ -156,41 +143,60 @@ fun main(args: Array<String>) {
         println("Error creating or confirming the sales order: ${e.message}")
     }
 
+    val orderLineValues = mapOf(
+        "order_id" to 1,
+        "product_id" to 1
+    )
 
+    val orderLine = models.execute(
+        modelConfig,
+        "execute_kw",
+        listOf(
+            db, uid, password,
+            "sale.order.line", "create",
+            listOf(orderLineValues)
+        )) as Int
 
-
-
-
-
-
-
-
-
+    println("\r\n\r\n### READ - Reading rental orders and order lines ###")
+/*
     val orderLineList = models.execute(
         modelConfig,
         "execute_kw",
         listOf(
             db, uid, password,
-            "sale.order.line", "read",
-            listOf(arrayOf(0,1,2,3,4,5,6,7,8,9)),
+            "sale.order.line", "search_read",
+            listOf(emptyList<Any>()),
             mapOf("fields" to listOf("product_id"))
         )
     ) as Array<*>
 
     printXMLRPC(orderLineList)
-
+*/
     val rentalList = models.execute(
         modelConfig,
         "execute_kw",
         listOf(
             db, uid, password,
-            "sale.order", "read",
-            listOf(arrayOf(33)),
+            "sale.order", "search_read",
+            listOf(emptyList<Any>()),
             mapOf("fields" to listOf("name"))
         )
     ) as Array<*>
 
     printXMLRPC(rentalList)
+
+    val partnerList = models.execute(
+        modelConfig,
+        "execute_kw",
+        listOf(
+            db, uid, password,
+            "res.users", "search_read",
+            listOf(emptyList<Any>()),
+            mapOf("fields" to listOf("partner_id"))
+        )
+    ) as Array<*>
+
+    printXMLRPC(partnerList)
 
     /**
      * FIELDS_GET - Fetching all the fields for a given model
